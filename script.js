@@ -190,7 +190,7 @@ function showOrderForm(itemName) {
     modal.show();
 }
 
-// Google Sheets Submission
+// Google Sheets Submission (Updated with FormData to fix CORS)
 document.getElementById('orderForm').addEventListener('submit', function(e) {
     e.preventDefault();
     const itemName = document.getElementById('itemName').value;
@@ -198,16 +198,29 @@ document.getElementById('orderForm').addEventListener('submit', function(e) {
     const customerPhone = document.getElementById('customerPhone').value;
     const customerAddress = document.getElementById('customerAddress').value;
 
-    const scriptURL = 'https://script.google.com/macros/library/d/12fZ3MFuUNZs-J4xb7fiTlwxySku88-vygxfQiZaV2yfKVqrqDQJPaDbs/2'; // Replace with your actual URL
+    const scriptURL = 'https://script.google.com/macros/s/AKfycbxSidoO_xuT9RGsVf6U1qMZeHZJ1Fq877GpuH0V5w7qV_03eBN_r4Nw-5fUxHi4lRzGLw/exec';
+
+    // Use FormData to avoid CORS preflight issues
+    const formData = new FormData();
+    formData.append('itemName', itemName);
+    formData.append('customerName', customerName);
+    formData.append('customerPhone', customerPhone);
+    formData.append('customerAddress', customerAddress);
+    formData.append('timestamp', new Date().toISOString());
+
     fetch(scriptURL, {
         method: 'POST',
-        body: JSON.stringify({ itemName, customerName, customerPhone, customerAddress, timestamp: new Date() }),
-        headers: { 'Content-Type': 'application/json' }
+        body: formData // No headers needed, FormData simplifies CORS
     })
-    .then(() => {
-        alert('Order submitted successfully!');
-        bootstrap.Modal.getInstance(document.getElementById('orderModal')).hide();
-        document.getElementById('orderForm').reset();
+    .then(response => response.json()) // Expect JSON response from Google Apps Script
+    .then(data => {
+        if (data.status === 'success') {
+            alert('Order submitted successfully!');
+            bootstrap.Modal.getInstance(document.getElementById('orderModal')).hide();
+            document.getElementById('orderForm').reset();
+        } else {
+            alert('Error submitting order.');
+        }
     })
-    .catch(err => alert('Error: ' + err));
+    .catch(err => alert('Error: ' + err.message));
 });
