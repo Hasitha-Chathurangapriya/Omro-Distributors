@@ -198,7 +198,7 @@ document.getElementById('orderForm').addEventListener('submit', function(e) {
     const customerPhone = document.getElementById('customerPhone').value;
     const customerAddress = document.getElementById('customerAddress').value;
 
-    const scriptURL = 'YOUR_GOOGLE_APPS_SCRIPT_URL'; // Replace with your actual URL
+    const scriptURL = 'https://script.google.com/macros/s/AKfycbzHvmjfu1Sv7ysjEtk_Kklok-QhuEJAnY1MKo1-lZqqZQNchK3TKYUXohgmEXC7qHhN8g/exec'; // Replace with your actual URL
     fetch(scriptURL, {
         method: 'POST',
         body: JSON.stringify({ itemName, customerName, customerPhone, customerAddress, timestamp: new Date() }),
